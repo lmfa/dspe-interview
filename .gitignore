@@ -1,0 +1,20 @@
+# Rust
+dspe_interview_backend/target/
+dspe_interview_backend/*.db
+dspe_interview_backend/*.db-journal
+
+# Environment
+dspe_interview_backend/.env
+
+# .NET / Blazor
+DSPEInterviewFrontend/bin/
+DSPEInterviewFrontend/obj/
+
+# IDE
+.vs/
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
