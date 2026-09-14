@@ -11,5 +11,5 @@ CREATE TABLE questions
 
     suggested_answer TEXT NOT NULL,
 
-    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TEXT NOT NULL
 );

@@ -17,8 +17,8 @@ pub async fn get_questions(
             r#"
             SELECT
                 id,
-                seniority_level,
-                topic,
+                seniority_level_id,
+                topic_id,
                 question_text,
                 suggested_answer
             FROM questions
@@ -36,23 +36,48 @@ pub async fn create_question(
     Json(dto): Json<CreateQuestionDto>,
 )
 {
-    sqlx::query(
+    let mut tx = pool.begin().await.unwrap();
+
+    let result = sqlx::query(
         r#"
         INSERT INTO questions
         (
-            seniority_level,
-            topic,
+            seniority_level_id,
+            topic_id,
             question_text,
             suggested_answer
         )
         VALUES (?, ?, ?, ?)
         "#
     )
-    .bind(dto.seniority_level)
-    .bind(dto.topic)
+    .bind(dto.seniority_level_id)
+    .bind(dto.topic_id)
     .bind(dto.question_text)
     .bind(dto.suggested_answer)
-    .execute(&pool)
+    .execute(&mut *tx)
     .await
     .unwrap();
+
+    let question_id = result.last_insert_rowid();
+
+    for technology_id in dto.technology_ids
+    {
+        sqlx::query(
+            r#"
+            INSERT INTO question_technologies
+            (
+                question_id,
+                technology_id
+            )
+            VALUES (?, ?)
+            "#
+        )
+        .bind(question_id)
+        .bind(technology_id)
+        .execute(&mut *tx)
+        .await
+        .unwrap();
+    }
+
+    tx.commit().await.unwrap();
 }

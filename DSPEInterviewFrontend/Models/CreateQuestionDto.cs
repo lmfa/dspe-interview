@@ -1,11 +1,13 @@
 ﻿
 public class CreateQuestionDto
 {
-    public string SeniorityLevel { get; set; } = string.Empty;
+    public long SeniorityLevelId { get; set; }
 
-    public string Topic { get; set; } = string.Empty;
+    public long TopicId { get; set; }
 
     public string QuestionText { get; set; } = string.Empty;
 
     public string SuggestedAnswer { get; set; } = string.Empty;
+
+    public List<long> TechnologyIds { get; set; } = [];
 }

@@ -4,80 +4,170 @@
 
 <h3>Add Interview Question</h3>
 
-<div class="mb-3">
-    <label>Seniority</label>
+@if (!_loaded)
+{
+    <p>Loading data...</p>
+}
+else
+{
+    <div class="mb-3">
 
-    <InputSelect class="form-select"
-                 @bind-Value="_seniority">
+        <label class="form-label">
+            Seniority Level
+        </label>
 
-        <option value="">Select...</option>
+        <InputSelect class="form-select"
+                     @bind-Value="_question.SeniorityLevelId">
 
-        @foreach (var level in Enum.GetValues<SeniorityLevel>())
+            @foreach (var level in _levels)
+            {
+                <option value="@level.Id">
+                    @level.Name
+                </option>
+            }
+
+        </InputSelect>
+
+    </div>
+
+    <div class="mb-3">
+
+        <label class="form-label">
+            Topic
+        </label>
+
+        <InputSelect class="form-select"
+                     @bind-Value="_question.TopicId">
+
+            @foreach (var topic in _topics)
+            {
+                <option value="@topic.Id">
+                    @topic.Name
+                </option>
+            }
+
+        </InputSelect>
+
+    </div>
+
+    <div class="mb-3">
+
+        <label class="form-label">
+            Technologies
+        </label>
+
+        @foreach (var technology in _technologies)
         {
-            <option value="@level">@level</option>
+            <div class="form-check">
+
+                <input class="form-check-input"
+                       type="checkbox"
+                       @bind="technology.Selected" />
+
+                <label class="form-check-label">
+                    @technology.Name
+                </label>
+
+            </div>
         }
 
-    </InputSelect>
-</div>
+    </div>
 
-<div class="mb-3">
-    <label>Topic</label>
+    <div class="mb-3">
 
-    <InputSelect class="form-select"
-                 @bind-Value="_topic">
+        <label class="form-label">
+            Question
+        </label>
 
-        <option value="">Select...</option>
+        <InputTextArea class="form-control"
+                       rows="4"
+                       @bind-Value="_question.QuestionText" />
 
-        @foreach (var topic in Enum.GetValues<QuestionTopic>())
-        {
-            <option value="@topic">@topic</option>
-        }
+    </div>
 
-    </InputSelect>
-</div>
+    <div class="mb-3">
 
-<div class="mb-3">
-    <label>Question</label>
+        <label class="form-label">
+            Suggested Answer
+        </label>
 
-    <InputTextArea class="form-control"
-                   rows="4"
-                   @bind-Value="_questionText" />
-</div>
+        <InputTextArea class="form-control"
+                       rows="8"
+                       @bind-Value="_question.SuggestedAnswer" />
 
-<div class="mb-3">
-    <label>Suggested Answer</label>
+    </div>
 
-    <InputTextArea class="form-control"
-                   rows="8"
-                   @bind-Value="_suggestedAnswer" />
-</div>
+    <button class="btn btn-primary"
+            @onclick="SaveQuestion">
 
-<button class="btn btn-primary"
-        @onclick="SaveQuestion">
-    Save Question
-</button>
+        Save
+
+    </button>
+
+    @if (!string.IsNullOrEmpty(_message))
+    {
+        <div class="alert alert-success mt-3">
+            @_message
+        </div>
+    }
+}
 
 @code {
 
-    private SeniorityLevel _seniority;
-    private QuestionTopic _topic;
+    private bool _loaded;
 
-    private string _questionText = string.Empty;
-    private string _suggestedAnswer = string.Empty;
+    private string _message = string.Empty;
+
+    private CreateQuestionDto _question = new();
+
+    private List<QuestionTopicDto> _topics = [];
+
+    private List<SeniorityLevelDto> _levels = [];
+
+    private List<TechnologyDto> _technologies = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        _topics =
+            await QuestionService.GetTopicsAsync();
+
+        _levels =
+            await QuestionService.GetSeniorityLevelsAsync();
+
+        _technologies =
+            await QuestionService.GetTechnologiesAsync();
+
+        if (_levels.Any())
+            _question.SeniorityLevelId = _levels.First().Id;
+
+        if (_topics.Any())
+            _question.TopicId = _topics.First().Id;
+
+        _loaded = true;
+    }
 
     private async Task SaveQuestion()
     {
-        // Chamada ao backend
-        await QuestionService.CreateQuestionAsync(new CreateQuestionDto
+        _question.TechnologyIds =
+            _technologies
+                .Where(t => t.Selected)
+                .Select(t => t.Id)
+                .ToList();
+
+        await QuestionService.CreateQuestionAsync(
+            _question);
+
+        _message = "Question saved successfully.";
+
+        _question = new CreateQuestionDto
         {
-            SeniorityLevel = _seniority.ToString(),
-            Topic = _topic.ToString(),
-            QuestionText = _questionText,
-            SuggestedAnswer = _suggestedAnswer
-        });
+            SeniorityLevelId = _levels.First().Id,
+            TopicId = _topics.First().Id
+        };
 
-        _questionText = string.Empty;
-        _suggestedAnswer = string.Empty;
+        foreach (var technology in _technologies)
+        {
+            technology.Selected = false;
+        }
     }
-
 }
