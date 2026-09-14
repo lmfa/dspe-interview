@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net.Http.Json;
+﻿using System.Net.Http.Json;
 
 public class CandidateService
 {
@@ -13,7 +12,21 @@ public class CandidateService
     public async Task<List<CandidateDto>> GetCandidatesAsync()
     {
         return await _httpClient.GetFromJsonAsync<List<CandidateDto>>(
-            "http://localhost:8080/candidates")
+            "candidates")
             ?? new();
+    }
+
+    public async Task CreateCandidateAsync(string name)
+    {
+        var dto = new CreateCandidateDto
+        {
+            Name = name
+        };
+
+        var response = await _httpClient.PostAsJsonAsync(
+            "candidates",
+            dto);
+
+        response.EnsureSuccessStatusCode();
     }
 }

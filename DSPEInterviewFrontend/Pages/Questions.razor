@@ -1,0 +1,83 @@
+﻿@page "/questions"
+
+@inject QuestionService QuestionService
+
+<h3>Add Interview Question</h3>
+
+<div class="mb-3">
+    <label>Seniority</label>
+
+    <InputSelect class="form-select"
+                 @bind-Value="_seniority">
+
+        <option value="">Select...</option>
+
+        @foreach (var level in Enum.GetValues<SeniorityLevel>())
+        {
+            <option value="@level">@level</option>
+        }
+
+    </InputSelect>
+</div>
+
+<div class="mb-3">
+    <label>Topic</label>
+
+    <InputSelect class="form-select"
+                 @bind-Value="_topic">
+
+        <option value="">Select...</option>
+
+        @foreach (var topic in Enum.GetValues<QuestionTopic>())
+        {
+            <option value="@topic">@topic</option>
+        }
+
+    </InputSelect>
+</div>
+
+<div class="mb-3">
+    <label>Question</label>
+
+    <InputTextArea class="form-control"
+                   rows="4"
+                   @bind-Value="_questionText" />
+</div>
+
+<div class="mb-3">
+    <label>Suggested Answer</label>
+
+    <InputTextArea class="form-control"
+                   rows="8"
+                   @bind-Value="_suggestedAnswer" />
+</div>
+
+<button class="btn btn-primary"
+        @onclick="SaveQuestion">
+    Save Question
+</button>
+
+@code {
+
+    private SeniorityLevel _seniority;
+    private QuestionTopic _topic;
+
+    private string _questionText = string.Empty;
+    private string _suggestedAnswer = string.Empty;
+
+    private async Task SaveQuestion()
+    {
+        // Chamada ao backend
+        await QuestionService.CreateQuestionAsync(new CreateQuestionDto
+        {
+            SeniorityLevel = _seniority.ToString(),
+            Topic = _topic.ToString(),
+            QuestionText = _questionText,
+            SuggestedAnswer = _suggestedAnswer
+        });
+
+        _questionText = string.Empty;
+        _suggestedAnswer = string.Empty;
+    }
+
+}

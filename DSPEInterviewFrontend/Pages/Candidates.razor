@@ -4,17 +4,30 @@
 
 <h3>Candidates</h3>
 
+<div class="mb-3">
+    <input class="form-control"
+           @bind="_candidateName"
+           placeholder="Candidate Name" />
+</div>
+
+<div class="mb-3">
+    <button class="btn btn-primary"
+            @onclick="AddCandidate">
+        Add Candidate
+    </button>
+</div>
+
 @if (_candidates == null)
 {
     <p>Loading...</p>
 }
-else if (_candidates.Count == 0)
+else if (!_candidates.Any())
 {
     <p>No candidates found.</p>
 }
 else
 {
-    <table class="table">
+    <table class="table table-striped">
         <thead>
             <tr>
                 <th>Id</th>
@@ -23,7 +36,6 @@ else
         </thead>
 
         <tbody>
-
             @foreach (var candidate in _candidates)
             {
                 <tr>
@@ -31,7 +43,6 @@ else
                     <td>@candidate.Name</td>
                 </tr>
             }
-
         </tbody>
     </table>
 }
@@ -39,9 +50,29 @@ else
 @code {
 
     private List<CandidateDto>? _candidates;
+    private string _candidateName = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
+        await LoadCandidates();
+    }
+
+    private async Task LoadCandidates()
+    {
         _candidates = await CandidateService.GetCandidatesAsync();
     }
+
+    private async Task AddCandidate()
+    {
+        if (string.IsNullOrWhiteSpace(_candidateName))
+            return;
+
+        await CandidateService.CreateCandidateAsync(
+            _candidateName);
+
+        _candidateName = string.Empty;
+
+        await LoadCandidates();
+    }
+
 }
