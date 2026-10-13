@@ -42,18 +42,18 @@ public class QuestionService
         var result = new List<QuestionDto>();
         result = await _httpClient.GetFromJsonAsync<List<QuestionDto>>
             ("questions")
-            ?? new List<QuestionDto>();
+            ?? [];
 
         var topics = await GetTopicsAsync();
         var seniorityLevels = await GetSeniorityLevelsAsync();
         var technologies = await GetTechnologiesAsync();
 
-        result.ForEach(q =>
+        await Task.WhenAll(result.Select(async q =>
         {
             q.TopicName = topics.FirstOrDefault(t => t.Id == q.TopicId)?.Name ?? "Unknown";
             q.SeniorityLevelName = seniorityLevels.FirstOrDefault(s => s.Id == q.SeniorityLevelId)?.Name ?? "Unknown";
-            q.Technologies = [.. technologies.Where(t => t.Id == q.TopicId).Select(t => t.Name)];
-        });
+            q.Technologies = [.. (await GetTechnologiesByQuestionIdAsync((int)q.Id)).Select(t => t.Name)];
+        }));
 
         return result;
     }
