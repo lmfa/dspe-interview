@@ -71,6 +71,18 @@ else
             </div>
         }
 
+        <div class="form-check mt-2 border-top pt-2">
+            <input class="form-check-input"
+                   type="checkbox"
+                   id="selectAllTech"
+                   checked="@AreAllTechnologiesSelected()"
+                   @onchange="ToggleAllTechnologies" />
+
+            <label class="form-check-label" for="selectAllTech">
+                <strong>Select all</strong>
+            </label>
+        </div>
+
     </div>
 
     <div class="mb-3">
@@ -168,6 +180,20 @@ else
         foreach (var technology in _technologies)
         {
             technology.Selected = false;
+        }
+    }
+
+    private bool AreAllTechnologiesSelected()
+    {
+        return _technologies.Count > 0 && _technologies.All(t => t.Selected);
+    }
+
+    private void ToggleAllTechnologies(ChangeEventArgs e)
+    {
+        bool selectAll = (bool)(e.Value ?? false);
+        foreach (var technology in _technologies)
+        {
+            technology.Selected = selectAll;
         }
     }
 }
