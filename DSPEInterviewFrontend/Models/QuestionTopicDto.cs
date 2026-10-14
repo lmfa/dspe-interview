@@ -6,4 +6,6 @@ public class QuestionTopicDto
     public string Name { get; set; } = string.Empty;
 
     public string Goal { get; set; } = string.Empty;
+
+    public bool Selected { get; set; } = true;
 }

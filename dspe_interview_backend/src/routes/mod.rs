@@ -37,5 +37,9 @@ pub fn create_routes(pool: SqlitePool) -> Router
             "/technologies",
             get(technology_handler::get_technologies)
         )
+        .route(
+            "/technologies/{technology_id}/topics",
+            get(technology_handler::get_technology_topics),
+)
         .with_state(pool)
 }

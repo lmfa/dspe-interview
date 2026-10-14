@@ -30,6 +30,13 @@ public class QuestionService
             ?? [];
     }
 
+    public async Task<List<QuestionTopicDto>> GetTopicsByTechnologyAsync(long technologyId)
+    {
+        return await _httpClient.GetFromJsonAsync<List<QuestionTopicDto>>
+            ($"technologies/{technologyId}/topics")
+            ?? [];
+    }
+
     public async Task<List<TechnologyDto>> GetTechnologiesByQuestionIdAsync(int questionId)
     {
         return await _httpClient.GetFromJsonAsync<List<TechnologyDto>>
@@ -66,5 +73,16 @@ public class QuestionService
                 dto);
 
         response.EnsureSuccessStatusCode();
+    }
+
+    public async Task<List<QuestionDto>> GetQuestionsByFiltersAsync(long technologyId, List<long> topicIds, long seniorityLevelId)
+    {
+        var allQuestions = await GetQuestionsAsync();
+
+        return allQuestions
+            .Where(q => 
+                topicIds.Contains(q.TopicId) &&
+                q.SeniorityLevelId == seniorityLevelId)
+            .ToList();
     }
 }

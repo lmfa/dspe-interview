@@ -1,0 +1,193 @@
+@page "/interview"
+
+@inject QuestionService QuestionService
+
+<h3>Interview</h3>
+
+@if (!_loaded)
+{
+    <p>Loading data...</p>
+}
+else
+{
+    <div class="mb-3">
+        <label class="form-label">Select technology and seniority</label>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <select class="form-select" @onchange="HandleTechnologyChange">
+                <option value="">-- Select Technology --</option>
+                @foreach (var tech in _technologies)
+                {
+                    <option value="@tech.Id" selected="@(_selectedTechnologyId == tech.Id.ToString())">@tech.Name</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <select class="form-select" @bind="_selectedSeniorityLevelId">
+                <option value="">-- Select Seniority Level --</option>
+                @foreach (var level in _seniorityLevels)
+                {
+                    <option value="@level.Id">@level.Name</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <button class="btn btn-primary" 
+                    disabled="@(string.IsNullOrEmpty(_selectedTechnologyId) || string.IsNullOrEmpty(_selectedSeniorityLevelId))" 
+                    @onclick="Generate">Generate</button>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(_selectedTechnologyId))
+    {
+        <div class="mb-3">
+            <label class="form-label">Choose Topics to include in the interview</label>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="border p-3 bg-light">
+                    @if (!_topics.Any())
+                    {
+                        <p>No topics available for the selected technology.</p>
+                    }
+                    else
+                    {
+                        @foreach (var topic in _topics)
+                        {
+                            <div class="form-check">
+                                <input class="form-check-input" 
+                                       type="checkbox" 
+                                       id="topic_@topic.Id"
+                                       @bind="topic.Selected" />
+                                <label class="form-check-label" for="topic_@topic.Id">
+                                    @topic.Name
+                                </label>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(_message))
+    {
+        <div class="alert alert-info mt-3">
+            @_message
+        </div>
+    }
+
+    @if (_generatedQuestions.Any())
+    {
+        <div class="mt-5">
+            <h4>Generated Interview Questions</h4>
+            @foreach (var topicGroup in _generatedQuestions.GroupBy(q => q.TopicName))
+            {
+                <div class="mb-4">
+                    <h5 class="text-primary">@topicGroup.Key</h5>
+                    @foreach (var question in topicGroup)
+                    {
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h6 class="card-subtitle mb-2 text-muted">Question @question.Id</h6>
+                                <p class="card-text"><strong>Question:</strong> @question.QuestionText</p>
+                                <p class="card-text"><strong>Suggested Answer:</strong> @question.SuggestedAnswer</p>
+                                <small class="text-muted">Seniority: @question.SeniorityLevelName</small>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+}
+
+@code {
+    private bool _loaded;
+    private List<TechnologyDto> _technologies = new();
+    private List<SeniorityLevelDto> _seniorityLevels = new();
+    private List<QuestionTopicDto> _topics = new();
+    private List<QuestionDto> _generatedQuestions = new();
+    private string _selectedTechnologyId = string.Empty;
+    private string _selectedSeniorityLevelId = string.Empty;
+    private string _message = string.Empty;
+    private readonly Random _random = new Random();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _technologies = await QuestionService.GetTechnologiesAsync();
+        _seniorityLevels = await QuestionService.GetSeniorityLevelsAsync();
+        _loaded = true;
+    }
+
+    private async Task HandleTechnologyChange(ChangeEventArgs e)
+    {
+        _selectedTechnologyId = e.Value?.ToString() ?? string.Empty;
+        await OnTechnologyChanged();
+    }
+
+    private async Task OnTechnologyChanged()
+    {
+        if (!string.IsNullOrEmpty(_selectedTechnologyId) && long.TryParse(_selectedTechnologyId, out var technologyId))
+        {
+            _topics = await QuestionService.GetTopicsByTechnologyAsync(technologyId);
+            _message = string.Empty;
+            _generatedQuestions = new();
+        }
+        else
+        {
+            _topics = new();
+            _generatedQuestions = new();
+        }
+    }
+
+    private async Task Generate()
+    {
+        if (string.IsNullOrEmpty(_selectedTechnologyId) || string.IsNullOrEmpty(_selectedSeniorityLevelId))
+        {
+            _message = "Please select both technology and seniority level.";
+            return;
+        }
+
+        var selectedTopicIds = _topics
+            .Where(t => t.Selected)
+            .Select(t => t.Id)
+            .ToList();
+
+        if (!selectedTopicIds.Any())
+        {
+            _message = "Please select at least one topic.";
+            return;
+        }
+
+        if (!long.TryParse(_selectedTechnologyId, out var technologyId) || !long.TryParse(_selectedSeniorityLevelId, out var seniorityLevelId))
+        {
+            _message = "Invalid selection.";
+            return;
+        }
+
+        // Fetch questions matching the filters
+        var allMatchingQuestions = await QuestionService.GetQuestionsByFiltersAsync(technologyId, selectedTopicIds, seniorityLevelId);
+
+        // Select up to 2 questions from each topic randomly
+        _generatedQuestions = allMatchingQuestions
+            .GroupBy(q => q.TopicId)
+            .SelectMany(group => group.OrderBy(_ => _random.Next()).Take(2))
+            .ToList();
+
+        if (_generatedQuestions.Any())
+        {
+            _message = $"Generated {_generatedQuestions.Count} interview questions.";
+        }
+        else
+        {
+            _message = "No questions found matching the selected criteria.";
+            _generatedQuestions = new();
+        }
+    }
+}
