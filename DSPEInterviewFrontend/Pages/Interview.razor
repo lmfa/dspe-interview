@@ -89,7 +89,44 @@ else
             @foreach (var topicGroup in _generatedQuestions.GroupBy(q => q.TopicName))
             {
                 <div class="mb-4">
-                    <h5 class="text-primary">@topicGroup.Key</h5>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="text-primary mb-0">@topicGroup.Key</h5>
+                        <button class="btn btn-sm btn-outline-primary" 
+                                @onclick="@(() => ToggleManualAddDropdown(topicGroup.Key))">
+                            Add Question
+                        </button>
+                    </div>
+
+                    @if (_openDropdownTopic == topicGroup.Key)
+                    {
+                        <div class="border p-3 bg-light mb-3">
+                            @{
+                                var allTopicQuestions = GetAllQuestionsForTopic(topicGroup.Key);
+                                if (allTopicQuestions.Any())
+                                {
+                                    @foreach (var q in allTopicQuestions)
+                                    {
+                                        bool isSelected = topicGroup.Any(tq => tq.Id == q.Id);
+                                        <div class="form-check">
+                                            <input class="form-check-input" 
+                                                   type="checkbox" 
+                                                   id="addquestion_@q.Id"
+                                                   checked="@isSelected"
+                                                   @onchange="@((ChangeEventArgs e) => HandleManualAddQuestion(q, (bool)e.Value, topicGroup.Key))" />
+                                            <label class="form-check-label" for="addquestion_@q.Id">
+                                                @q.QuestionText.Substring(0, Math.Min(80, q.QuestionText.Length))...
+                                            </label>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <p>No other questions available for this topic.</p>
+                                }
+                            }
+                        </div>
+                    }
+
                     @foreach (var question in topicGroup)
                     {
                         <div class="card mb-3">
@@ -113,9 +150,11 @@ else
     private List<SeniorityLevelDto> _seniorityLevels = new();
     private List<QuestionTopicDto> _topics = new();
     private List<QuestionDto> _generatedQuestions = new();
+    private List<QuestionDto> _allMatchingQuestions = new();
     private string _selectedTechnologyId = string.Empty;
     private string _selectedSeniorityLevelId = string.Empty;
     private string _message = string.Empty;
+    private string _openDropdownTopic = string.Empty;
     private readonly Random _random = new Random();
 
     protected override async Task OnInitializedAsync()
@@ -138,11 +177,13 @@ else
             _topics = await QuestionService.GetTopicsByTechnologyAsync(technologyId);
             _message = string.Empty;
             _generatedQuestions = new();
+            _allMatchingQuestions = new();
         }
         else
         {
             _topics = new();
             _generatedQuestions = new();
+            _allMatchingQuestions = new();
         }
     }
 
@@ -172,10 +213,10 @@ else
         }
 
         // Fetch questions matching the filters
-        var allMatchingQuestions = await QuestionService.GetQuestionsByFiltersAsync(technologyId, selectedTopicIds, seniorityLevelId);
+        _allMatchingQuestions = await QuestionService.GetQuestionsByFiltersAsync(technologyId, selectedTopicIds, seniorityLevelId);
 
         // Select up to 2 questions from each topic randomly
-        _generatedQuestions = allMatchingQuestions
+        _generatedQuestions = _allMatchingQuestions
             .GroupBy(q => q.TopicId)
             .SelectMany(group => group.OrderBy(_ => _random.Next()).Take(2))
             .ToList();
@@ -189,5 +230,39 @@ else
             _message = "No questions found matching the selected criteria.";
             _generatedQuestions = new();
         }
+
+        _openDropdownTopic = string.Empty;
+    }
+
+    private void ToggleManualAddDropdown(string topicName)
+    {
+        _openDropdownTopic = _openDropdownTopic == topicName ? string.Empty : topicName;
+    }
+
+    private List<QuestionDto> GetAllQuestionsForTopic(string topicName)
+    {
+        return _allMatchingQuestions
+            .Where(q => q.TopicName == topicName)
+            .ToList();
+    }
+
+    private void HandleManualAddQuestion(QuestionDto question, bool isChecked, string topicName)
+    {
+        if (isChecked)
+        {
+            // Add question if not already in the list
+            if (!_generatedQuestions.Any(q => q.Id == question.Id))
+            {
+                _generatedQuestions.Add(question);
+            }
+        }
+        else
+        {
+            // Remove question
+            _generatedQuestions.RemoveAll(q => q.Id == question.Id);
+        }
+
+        // Close the dropdown
+        _openDropdownTopic = string.Empty;
     }
 }
