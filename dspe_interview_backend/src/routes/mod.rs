@@ -1,9 +1,9 @@
 use crate::handlers::{
-    candidate_handler, question_handler, question_technology_handler, question_topic_handler, seniority_level_handler, technology_handler
+    candidate_handler, question_handler, question_technology_handler, question_topic_handler, seniority_level_handler, technology_handler, interview_result_handler
 };
 
 use axum::{
-    routing::get,
+    routing::{get, post},
     Router,
 };
 use sqlx::SqlitePool;
@@ -40,6 +40,10 @@ pub fn create_routes(pool: SqlitePool) -> Router
         .route(
             "/technologies/{technology_id}/topics",
             get(technology_handler::get_technology_topics),
-)
+        )
+        .route(
+            "/interview-results",
+            post(interview_result_handler::save_interview_result),
+        )
         .with_state(pool)
 }

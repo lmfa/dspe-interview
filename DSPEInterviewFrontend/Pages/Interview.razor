@@ -1,6 +1,7 @@
 @page "/interview"
 
 @inject QuestionService QuestionService
+@inject CandidateService CandidateService
 
 <h3>Interview</h3>
 
@@ -10,6 +11,22 @@
 }
 else
 {
+    <div class="mb-3">
+        <label class="form-label">Select a candidate</label>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <select class="form-select" @bind="_selectedCandidateId">
+                <option value="">-- Select Candidate --</option>
+                @foreach (var candidate in _candidates)
+                {
+                    <option value="@candidate.Id">@candidate.Name</option>
+                }
+            </select>
+        </div>
+    </div>
+
     <div class="mb-3">
         <label class="form-label">Select technology and seniority</label>
     </div>
@@ -93,7 +110,7 @@ else
                         <h5 class="text-primary mb-0">@topicGroup.Key</h5>
                         <button class="btn btn-sm btn-outline-primary" 
                                 @onclick="@(() => ToggleManualAddDropdown(topicGroup.Key))">
-                            Add Question
+                            Add/Remove Question
                         </button>
                     </div>
 
@@ -133,7 +150,33 @@ else
                             <div class="card-body">
                                 <h6 class="card-subtitle mb-2 text-muted">Question @question.Id</h6>
                                 <p class="card-text"><strong>Question:</strong> @question.QuestionText</p>
-                                <p class="card-text"><strong>Suggested Answer:</strong> @question.SuggestedAnswer</p>
+                                <p class="card-text"><strong>Suggested answer:</strong> @question.SuggestedAnswer</p>
+
+                                <div class="mb-3">
+                                    <div class="row">
+                                        <div class="col-md-8">
+                                            <label class="form-label"><strong>Candidate response</strong></label>
+                                            <textarea class="form-control" 
+                                                      rows="4"
+                                                      placeholder="Enter candidate's response here..."
+                                                      @bind="@_candidateResponses[question.Id]"
+                                                      @bind:event="oninput">
+                                            </textarea>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label"><strong>Candidate Rate</strong></label>
+                                            <select class="form-select" @bind="@_candidateRatings[question.Id]">
+                                                <option value="">-- Select Rating --</option>
+                                                <option value="0">0</option>
+                                                <option value="1">1</option>
+                                                <option value="2">2</option>
+                                                <option value="3">3</option>
+                                                <option value="4">4</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <small class="text-muted">Seniority: @question.SeniorityLevelName</small>
                             </div>
                         </div>
@@ -141,16 +184,29 @@ else
                 </div>
             }
         </div>
+
+        <div class="mt-5 mb-5">
+            <div class="row">
+                <div class="col-md-12">
+                    <button class="btn btn-primary me-2" @onclick="SaveInterview">Save Interview</button>
+                    <button class="btn btn-primary">Export Interview</button>
+                </div>
+            </div>
+        </div>
     }
 }
 
 @code {
     private bool _loaded;
+    private List<CandidateDto> _candidates = new();
     private List<TechnologyDto> _technologies = new();
     private List<SeniorityLevelDto> _seniorityLevels = new();
     private List<QuestionTopicDto> _topics = new();
     private List<QuestionDto> _generatedQuestions = new();
     private List<QuestionDto> _allMatchingQuestions = new();
+    private Dictionary<long, string> _candidateResponses = new();
+    private Dictionary<long, string> _candidateRatings = new();
+    private string _selectedCandidateId = string.Empty;
     private string _selectedTechnologyId = string.Empty;
     private string _selectedSeniorityLevelId = string.Empty;
     private string _message = string.Empty;
@@ -159,6 +215,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        _candidates = await CandidateService.GetCandidatesAsync();
         _technologies = await QuestionService.GetTechnologiesAsync();
         _seniorityLevels = await QuestionService.GetSeniorityLevelsAsync();
         _loaded = true;
@@ -221,6 +278,15 @@ else
             .SelectMany(group => group.OrderBy(_ => _random.Next()).Take(2))
             .ToList();
 
+        // Initialize candidate responses and ratings for all generated questions
+        _candidateResponses = new();
+        _candidateRatings = new();
+        foreach (var question in _generatedQuestions)
+        {
+            _candidateResponses[question.Id] = string.Empty;
+            _candidateRatings[question.Id] = string.Empty;
+        }
+
         if (_generatedQuestions.Any())
         {
             _message = $"Generated {_generatedQuestions.Count} interview questions.";
@@ -254,15 +320,97 @@ else
             if (!_generatedQuestions.Any(q => q.Id == question.Id))
             {
                 _generatedQuestions.Add(question);
+                // Initialize candidate response and rating for the newly added question
+                _candidateResponses[question.Id] = string.Empty;
+                _candidateRatings[question.Id] = string.Empty;
             }
         }
         else
         {
             // Remove question
             _generatedQuestions.RemoveAll(q => q.Id == question.Id);
+            // Remove candidate response and rating for the removed question
+            _candidateResponses.Remove(question.Id);
+            _candidateRatings.Remove(question.Id);
         }
 
         // Close the dropdown
         _openDropdownTopic = string.Empty;
+    }
+
+    private string GetOrCreateCandidateResponse(long questionId)
+    {
+        if (!_candidateResponses.ContainsKey(questionId))
+        {
+            _candidateResponses[questionId] = string.Empty;
+        }
+        return _candidateResponses[questionId];
+    }
+
+    private void SetCandidateResponse(long questionId, string response)
+    {
+        _candidateResponses[questionId] = response;
+    }
+
+    private async Task SaveInterview()
+    {
+        if (string.IsNullOrEmpty(_selectedCandidateId))
+        {
+            _message = "Please select a candidate.";
+            return;
+        }
+
+        if (!_generatedQuestions.Any())
+        {
+            _message = "No questions to save.";
+            return;
+        }
+
+        if (!long.TryParse(_selectedCandidateId, out var candidateId) ||
+            !long.TryParse(_selectedTechnologyId, out var technologyId) ||
+            !long.TryParse(_selectedSeniorityLevelId, out var seniorityLevelId))
+        {
+            _message = "Invalid selections.";
+            return;
+        }
+
+        // Build the DTO to send to the backend
+        var interviewQuestions = new List<InterviewQuestionResultDto>();
+        foreach (var question in _generatedQuestions)
+        {
+            var response = _candidateResponses.ContainsKey(question.Id) ? _candidateResponses[question.Id] : string.Empty;
+            var ratingStr = _candidateRatings.ContainsKey(question.Id) ? _candidateRatings[question.Id] : "0";
+
+            if (!int.TryParse(ratingStr, out var rating))
+            {
+                rating = 0;
+            }
+
+            interviewQuestions.Add(new InterviewQuestionResultDto
+            {
+                QuestionId = question.Id,
+                TopicId = question.TopicId,
+                CandidateResponse = response,
+                CandidateRating = rating
+            });
+        }
+
+        var saveDto = new SaveInterviewResultDto
+        {
+            CandidateId = candidateId,
+            TechnologyId = technologyId,
+            SeniorityLevelId = seniorityLevelId,
+            Questions = interviewQuestions
+        };
+
+        try
+        {
+            var result = await QuestionService.SaveInterviewResultAsync(saveDto);
+            _message = $"Interview saved successfully with ID: {result.Id}";
+        }
+        catch (Exception ex)
+        {
+            _message = $"Error saving interview: {ex.Message}";
+        }
     }
 }

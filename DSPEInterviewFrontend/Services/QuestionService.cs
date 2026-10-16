@@ -85,4 +85,16 @@ public class QuestionService
                 q.SeniorityLevelId == seniorityLevelId)
             .ToList();
     }
+
+    public async Task<InterviewResultResponseDto> SaveInterviewResultAsync(SaveInterviewResultDto dto)
+    {
+        var response = await _httpClient.PostAsJsonAsync(
+            "interview-results",
+            dto);
+
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<InterviewResultResponseDto>()
+            ?? new InterviewResultResponseDto();
+    }
 }

@@ -1,0 +1,80 @@
+id,seniority_level_id,topic_id,question_text,suggested_answer,created_at
+2,1,1,What is the difference between a class and an object?,"A class is a blueprint/template.
+An object is an instance of a class.",2026-09-14 12:00:30
+3,1,1,What is the difference between == and .Equals() in C#?,"- == compares values for primitive types.
+- For reference types, == often compares references unless overloaded.
+- .Equals() compares object equality and can be overridden.",2026-09-14 13:39:36
+4,1,1,"What happens when an exception is thrown, and how do you handle it?","- Understanding of try, catch, and finally.
+- Awareness of logging and proper error handling.",2026-09-14 13:40:49
+5,2,5,What is a thread ?,"- A thread is the smallest unit of execution in a program.
+- A program can have multiple threads running at the same time, allowing it to perform several tasks concurrently.",2026-09-14 13:43:44
+6,1,10,What is WPF and what is its purpose?,Provides developers with an unified programming model for building line-of-business desktop applications on Windows.,2026-10-14 10:46:41
+7,1,10,What is the purpose of a XAML file?,"WPF uses the Extensible Application Markup Language (XAML) to provide a declarative model for application programming.
+XAML simplifies creating a UI for a .NET Framework application. 
+You can create visible UI elements in the declarative XAML markup, and then separate the UI definition from the run-time logic by using code-behind files.",2026-10-14 10:47:36
+8,1,10,What WPF frameworks do you know?,"Prism, Chinch, MVVM Light",2026-10-14 10:48:09
+9,2,10,What WPF frameworks do you know?,"Prism, Chinch, MVVM Light",2026-10-14 10:48:35
+10,3,10,What WPF frameworks do you know? Why are them useful?,"Prism, Chinch, MVVM Light
+Provide boilerplate code which simplifies the work of the developer.",2026-10-14 10:49:30
+11,2,10,What are the three main components of the MVVM pattern? How do they interact with each other?,"Model, View, iIew-Model.
+Communication occurs through data binding, where changes in one component are automatically reflected in the others.",2026-10-14 10:50:28
+12,3,10,What are the three main components of the MVVM pattern? How do they interact with each other?,"Model, View, iIew-Model.
+Communication occurs through data binding, where changes in one component are automatically reflected in the others.",2026-10-14 10:50:42
+13,3,10,How does data binding work in WPF? What types of data binding are available?,Data binding in WPF allows automatic synchronization of data between the source and destination.,2026-10-14 10:51:23
+14,3,10,Explain the concept of Two-Way Data Binding and give a practical example.,Two-Way Data Binding allows bidirectional updates between the UI and the model.,2026-10-14 10:51:52
+15,3,10,How are commands used in the MVVM pattern? Give an example of implementation.,"In MVVM, we use commands instead of events in the View to promote decoupling, logic reuse, facilitate unit testing, maintain consistency with the MVVM standard, and facilitate application maintenance over time. Commands provide a more powerful and flexible abstraction for handling actions, better aligning with MVVM principles.",2026-10-14 10:52:19
+16,3,10,What are styles and templates in WPF? How can they be used to improve visual consistency in an application?,Styles define the appearance of controls and can be reused. Templates define the visual structure of a control. They help with the visual consistency of the application.,2026-10-14 10:52:50
+17,1,9,What is the purpose of a windows service?,Makes background services available in the windows OS. Examples are MSSQL and ISS. They run as windows services.,2026-10-14 10:54:02
+18,2,9,What is the purpose of a windows service?,Makes background services available in the windows OS. Examples are MSSQL and ISS. They run as windows services.,2026-10-14 10:54:12
+19,3,9,What is the purpose of a windows service?,Makes background services available in the windows OS. Examples are MSSQL and ISS. They run as windows services.,2026-10-14 10:54:27
+20,1,7,What is ASP.NET MVC ?  ,"Decouple user-interface (view), data (model), and application logic (controller). 
+Requests are routed to a Controller which is responsible for working with the Model to perform actions and/or retrieve data. 
+The Controller chooses the View to display, and provides it with the Model. The View renders the final page, based on the data in the Model.",2026-10-14 10:55:59
+21,1,7,What is the purpose of an action filter?,Intercepts controller actions. An action filter is an attribute that you can apply to a controller action that modifies the way in which the action is executed. Action filters contain logic that is executed before and after a controller action executes.,2026-10-14 10:56:32
+22,2,7,What is the purpose of an action filter?,Intercepts controller actions. An action filter is an attribute that you can apply to a controller action that modifies the way in which the action is executed. Action filters contain logic that is executed before and after a controller action executes.,2026-10-14 10:57:35
+23,2,7,What is ASP.NET MVC ?  ,"Decouple user-interface (view), data (model), and application logic (controller). 
+Requests are routed to a Controller which is responsible for working with the Model to perform actions and/or retrieve data. 
+The Controller chooses the View to display, and provides it with the Model. The View renders the final page, based on the data in the Model.",2026-10-14 10:57:54
+24,3,7,What is ASP.NET MVC ?  ,"Decouple user-interface (view), data (model), and application logic (controller). 
+Requests are routed to a Controller which is responsible for working with the Model to perform actions and/or retrieve data. 
+The Controller chooses the View to display, and provides it with the Model. The View renders the final page, based on the data in the Model.",2026-10-14 10:58:08
+25,3,7,What is the purpose of an action filter?,Intercepts controller actions. An action filter is an attribute that you can apply to a controller action that modifies the way in which the action is executed. Action filters contain logic that is executed before and after a controller action executes.,2026-10-14 10:58:36
+26,2,8,What is WSDL?,Defines the contract/messages that might be exchanged in a SOAP Web Service. Uses XML.,2026-10-14 11:02:23
+27,3,8,What is WSDL?,Defines the contract/messages that might be exchanged in a SOAP Web Service. Uses XML,2026-10-14 11:02:54
+28,1,8,In SOAP web services what is the used format to exchange messages? ,XML and XSD to validate the messages. WSDL describes the endpoints and what kind of messages can be exchanged.,2026-10-14 11:04:56
+29,2,8,In SOAP web services what is the used format to exchange messages? ,XML and XSD to validate the messages. WSDL describes the endpoints and what kind of messages can be exchanged.,2026-10-14 11:05:09
+30,3,8,In SOAP web services what is the used format to exchange messages? ,XML and XSD to validate the messages. WSDL describes the endpoints and what kind of messages can be exchanged.,2026-10-14 11:05:23
+31,1,8,What are the HTTP verbs that you know?,"get(read) put(update) post(create) delete(delete) 
+(Seniors) -> patch(partial update) options(shows available verbs) head(same as get without the body).",2026-10-14 11:06:49
+32,2,8,What are the HTTP verbs that you know?,"get(read) put(update) post(create) delete(delete) 
+(Seniors) -> patch(partial update) options(shows available verbs) head(same as get without the body).",2026-10-14 11:07:01
+33,3,8,What are the HTTP verbs that you know?,"get(read) put(update) post(create) delete(delete) 
+(Seniors) -> patch(partial update) options(shows available verbs) head(same as get without the body).",2026-10-14 11:07:11
+34,1,4,What is an  ORM?,"Creates mappings between classes and DB entities.
+EntityFramework and Nhibernate are ORMs",2026-10-14 11:09:26
+35,2,4,What is an  ORM?,"Creates mappings between classes and DB entities.
+EntityFramework and Nhibernate are ORMs.",2026-10-14 11:09:40
+36,3,4,What is an  ORM?,"Creates mappings between classes and DB entities.
+EntityFramework and Nhibernate are ORMs.",2026-10-14 11:09:56
+37,3,4,Explain Eager Loading vs Lazy Loading ,Lazy only loads the objects/entities without loading their relations. Eager loads the objects/entities and their relations.,2026-10-14 11:11:04
+38,1,4,What kind of text data formats do you know to store data in files?,"JSON, XML.",2026-10-14 11:11:47
+39,2,4,What kind of text data formats do you know to store data in files?,"JSON, XML.",2026-10-14 11:12:05
+40,3,4,What kind of text data formats do you know to store data in files?,"JSON, XML.",2026-10-14 11:12:20
+41,1,4,Do you know the purpose of an XSD file? ,Define the structure and validate XML data according to the rules defined in the XSD file.,2026-10-14 11:13:35
+42,2,4,Do you know the purpose of an XSD file? ,Define the structure and validate XML data according to the rules defined in the XSD file.,2026-10-14 11:16:28
+43,3,4,Do you know the purpose of an XSD file? ,Define the structure and validate XML data according to the rules defined in the XSD file.,2026-10-14 11:16:42
+44,1,1,What is a JSON file?,It’s a file that contains data structured using Javascript object notation.,2026-10-14 11:17:11
+45,2,2,What is a purpose of generics?,"Code able to support multiple types. 
+Collections are examples for several types List<int> IList<int> . 
+Defer/delay the specification of one or more types until the class or method is declared and instantiated by client code.",2026-10-14 11:20:19
+46,3,2,What is a purpose of generics? ,"Code able to support multiple types. 
+Collections are examples for several types List<int> IList<int> . 
+Defer/delay the specification of one or more types until the class or method is declared and instantiated by client code.",2026-10-14 11:20:44
+47,1,2,What .NET collections interfaces do you know and what is their purpose?,"IEnumerable (iterator design pattern), ICollection and IList.",2026-10-14 11:23:53
+48,2,2,What .Net collections interfaces do you know and what is their purpose?,"IEnumerable (iterator design pattern), ICollection and IList.",2026-10-14 11:24:06
+49,3,2,What .Net collections interfaces do you know and what is their purpose?,"IEnumerable (iterator design pattern), ICollection and IList.",2026-10-14 11:24:18
+50,2,1,What is the purpose of the CLR? ,Execute compiled MSIL (intermediate language) in many platforms (operative systems).,2026-10-14 11:24:53
+51,2,1,What is the purpose of the CLR? ,Execute compiled MSIL (intermediate language) in many platforms (operative systems).,2026-10-14 11:25:05
+52,3,1,What is the purpose of the CLR? ,Execute compiled MSIL (intermediate language) in many platforms (operative systems).,2026-10-14 11:25:15
+53,2,1,What is the purpose of the GAC?,GAC-Global Assembly Cache- signed assemblies with strong names. Assembly A can only depend on an assembly B that is signed/strong named. Allows assembly sharing and to have multiple versions of an assembly in the whole OS.,2026-10-14 11:26:10
+54,3,1,What is the purpose of the GAC?,GAC-Global Assembly Cache- signed assemblies with strong names. Assembly A can only depend on an assembly B that is signed/strong named. Allows assembly sharing and to have multiple versions of an assembly in the whole OS.,2026-10-14 11:26:22

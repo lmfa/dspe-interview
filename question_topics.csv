@@ -1,0 +1,22 @@
+id,name,goal
+1,.NET,"Memory and Garbage collection, Value and ref types, Understanding of garbage collection, IDisposable, Assemblies, GAC, JIT, Reflection, AppDomains, CLR, Heaps"
+2,C#,"Indicates knowledge of C# language primitives like classes, interfaces, generics, events, dynamics, lamdba, attributes, exceptions, LINQ (queries, expressions, operations), anonymous methods/types"
+3,Collections,Provide a goal for this topic
+4,Data persisting,Provide a goal for this topic
+5,.NET Multithreading,"Thread/Task classes, Synchronization primitives, Async/await methods, TPL, PFX, PLINQ"
+6,ASP .NET WebForms,Provide a goal for this topic
+7,ASP .Net MVC,"Routes, Controllers, Standard conventions, Action filters, View results, View engines, Dependency resolvers"
+8,Web Services/Web APIs,Provide a goal for this topic
+9,Windows Services,Provide a goal for this topic
+10,WPF,"XAML (Property/collection syntax, Namespaces, markup extensions, type converters,  attached properties)\nWPF Core (Events, styles, resources, binding, control/data templates, standard controls, animation, triggers, custom/user controls, layout model, threading model, behaviors)\nWPF Frameworks (Prism, Chinch, MVVM Light)"
+11,OOP,"OOA/P concepts, Design Patterns, UML"
+12,DB,"External keys, normalization, triggers, stored procedures, JPA, Hybernate, ORM"
+13,Web Basics,"HTTP protocol, Servlets, JSP, JAX-RS, JAX-WS"
+14,Build Tools,Provide a goal for this topic
+15,Version Control,Provide a goal for this topic
+16,Unit Tests,"Mocks/fakes, IoC pattern, Lifetime managers, TDD, BDD"
+17,NoSQL,Provide a goal for this topic
+18,BigData,Provide a goal for this topic
+19,Cloud,Provide a goal for this topic
+20,SDLC,Provide a goal for this topic
+21,Security,Provide a goal for this topic
